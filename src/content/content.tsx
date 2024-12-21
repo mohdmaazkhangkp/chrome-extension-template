@@ -12,7 +12,7 @@ import { Highlight, themes } from 'prism-react-renderer'
 import { Input } from '@/components/ui/input'
 import { SYSTEM_PROMPT } from '@/constants/prompt'
 import { extractCode } from './util'
-
+import html2pdf from "html2pdf.js";
 import {
   Accordion,
   AccordionContent,
@@ -112,6 +112,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     }, 0)
   }, [chatHistory, isResponseLoading, visible])
 
+ 
   const heandelClearChat = async () => {
     const { clearChatHistory } = useIndexDB()
     await clearChatHistory(problemName)
@@ -553,6 +554,24 @@ const ContentPage: React.FC = () => {
     loadChromeStorage()
   }, [])
 
+  function convertDivToPDF(div) {
+      const options = {
+        margin: 1,
+        filename: "content.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      };
+  
+      html2pdf().set(options).from(div).save();
+  }
+
+  const handleExport = ()=>{
+    const elements = document.querySelectorAll('.markdown.prose');
+    convertDivToPDF(elements[1]);
+
+  }
+
   return (
     <div
       ref={ref}
@@ -635,7 +654,7 @@ const ContentPage: React.FC = () => {
       <div className="flex justify-end">
         <Button
           size={'icon'}
-          onClick={() => setChatboxExpanded(!chatboxExpanded)}
+          onClick={handleExport}
         >
           <Bot />
         </Button>
